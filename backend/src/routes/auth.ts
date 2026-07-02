@@ -1,8 +1,14 @@
 import { Router, Response } from 'express';
 import { UserRepository, ProductRepository } from '../models';
 import { hashPassword, comparePassword, generateToken, authenticate, AuthRequest } from '../utils/auth';
+import { OAuth2Client } from 'google-auth-library';
 
 const router = Router();
+
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID || '879535459202-3ifam87ectmujhg82quqedm9nlji8cu0.apps.googleusercontent.com'
+);
+
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -167,6 +173,69 @@ router.post('/wishlist', authenticate as any, async (req: AuthRequest, res: Resp
     });
   } catch (error: any) {
     res.status(500).json({ message: 'Server error updating wishlist.', error: error.message });
+  }
+});
+
+
+// @route   POST /api/auth/google
+// @desc    Authenticate with Google OAuth 2.0
+router.post('/google', async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ message: 'Google ID token is required.' });
+  }
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID || '879535459202-3ifam87ectmujhg82quqedm9nlji8cu0.apps.googleusercontent.com'
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: 'Invalid token payload.' });
+    }
+
+    const email = payload.email.toLowerCase();
+    const name = payload.name || 'Google User';
+
+    // Look for existing user
+    let user = await UserRepository.findOne({ email });
+
+    if (!user) {
+      // Create a new user with Google details and a random/hashed password
+      const randomPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const hashedPasswordString = await hashPassword(randomPassword);
+
+      user = await UserRepository.create({
+        name,
+        email,
+        password: hashedPasswordString,
+        phone: '',
+        role: 'user',
+        addresses: [],
+        wishlist: []
+      });
+    }
+
+    // Generate JWT token
+    const localToken = generateToken({ id: user._id.toString(), email: user.email, role: user.role });
+
+    res.status(200).json({
+      token: localToken,
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone || '',
+        addresses: user.addresses || [],
+        wishlist: user.wishlist || []
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Google authentication failed.', error: error.message });
   }
 });
 

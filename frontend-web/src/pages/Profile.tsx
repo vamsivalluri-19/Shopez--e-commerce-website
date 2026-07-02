@@ -5,6 +5,13 @@ import { authStart, authSuccess, authFailure, logout, updateAddresses } from '..
 import { User, Mail, Lock, Phone, MapPin, Heart, ShoppingBag, Truck, Calendar, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
+
 interface ProfileProps {
   setActivePage: (page: string) => void;
   setSelectedProductId: (id: string | null) => void;
@@ -58,6 +65,54 @@ export default function Profile({ setActivePage, setSelectedProductId }: Profile
       fetchMyOrders();
     }
   }, [isAuthenticated, activeTab]);
+
+  const handleGoogleCredentialResponse = async (response: any) => {
+    const idToken = response.credential;
+    dispatch(authStart());
+    try {
+      const res = await axios.post('/api/auth/google', { token: idToken });
+      dispatch(authSuccess({ token: res.data.token, user: res.data.user }));
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Google authentication failed.';
+      dispatch(authFailure(errMsg));
+      setSubmitError(errMsg);
+    }
+  };
+
+  useEffect(() => {
+    let interval: any;
+    if (!isAuthenticated && isLoginMode) {
+      const initGoogle = () => {
+        if (window.google && window.google.accounts) {
+          window.google.accounts.id.initialize({
+            client_id: "879535459202-3ifam87ectmujhg82quqedm9nlji8cu0.apps.googleusercontent.com",
+            callback: handleGoogleCredentialResponse
+          });
+          const btnParent = document.getElementById("google-signin-btn");
+          if (btnParent) {
+            window.google.accounts.id.renderButton(
+              btnParent,
+              { theme: "outline", size: "large", width: 382 }
+            );
+          }
+        }
+      };
+
+      if (window.google && window.google.accounts) {
+        initGoogle();
+      } else {
+        interval = setInterval(() => {
+          if (window.google && window.google.accounts) {
+            initGoogle();
+            clearInterval(interval);
+          }
+        }, 500);
+      }
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isAuthenticated, isLoginMode]);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,6 +256,19 @@ export default function Profile({ setActivePage, setSelectedProductId }: Profile
             {loading ? 'Authenticating...' : isLoginMode ? 'Secure Sign In' : 'Register Account'}
           </button>
         </form>
+
+        {isLoginMode && (
+          <div className="space-y-4">
+            <div className="relative flex py-2 items-center">
+              <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
+              <span className="flex-shrink mx-4 text-[9px] text-neutral-400 uppercase tracking-widest font-bold">OR</span>
+              <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
+            </div>
+            <div className="w-full flex justify-center">
+              <div id="google-signin-btn" className="w-full max-w-[382px]"></div>
+            </div>
+          </div>
+        )}
 
         <div className="text-center text-xs">
           {isLoginMode ? (
