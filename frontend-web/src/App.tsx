@@ -11,6 +11,9 @@ import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 import axios from 'axios';
 
+// Configure global API base URL for production (Vercel -> Render connection)
+axios.defaults.baseURL = (import.meta as any).env.VITE_API_URL || '';
+
 export default function App() {
   const dispatch = useDispatch();
   
