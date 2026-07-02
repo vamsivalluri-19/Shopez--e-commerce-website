@@ -308,7 +308,81 @@ async function seed() {
   process.exit(0);
 }
 
-seed().catch(err => {
-  console.error("Error seeding database:", err);
-  process.exit(1);
-});
+export async function ensureSeedData() {
+  const [products, users] = await Promise.all([
+    ProductRepository.find({}),
+    UserRepository.find()
+  ]);
+
+  if (products.length > 0 && users.length > 0) {
+    return;
+  }
+
+  console.log('Bootstrapping default ShopEZ data...');
+
+  if (products.length === 0) {
+    const seededProducts = generateSeededProducts();
+    for (const prod of seededProducts) {
+      await ProductRepository.create(prod);
+    }
+    console.log(`Seeded ${seededProducts.length} products for the empty database.`);
+  }
+
+  if (users.length === 0) {
+    const hashedAdminPass = await hashPassword('adminpassword');
+    const hashedUserPass = await hashPassword('userpassword');
+
+    await UserRepository.create({
+      name: "ShopEZ Admin Manager",
+      email: "admin@shopez.com",
+      password: hashedAdminPass,
+      role: "admin",
+      phone: "+15550199",
+      addresses: [
+        {
+          street: "742 Evergreen Terrace",
+          city: "Springfield",
+          state: "OR",
+          zipCode: "97477",
+          country: "USA",
+          isDefault: true
+        }
+      ]
+    });
+
+    await UserRepository.create({
+      name: "Jane Doe Customer",
+      email: "user@shopez.com",
+      password: hashedUserPass,
+      role: "user",
+      phone: "+15550299",
+      addresses: [
+        {
+          street: "221B Baker Street",
+          city: "London",
+          state: "England",
+          zipCode: "NW1 6XE",
+          country: "UK",
+          isDefault: true
+        },
+        {
+          street: "10 Downing Street",
+          city: "London",
+          state: "England",
+          zipCode: "SW1A 2AA",
+          country: "UK",
+          isDefault: false
+        }
+      ]
+    });
+
+    console.log('Seeded default admin and customer accounts.');
+  }
+}
+
+if (require.main === module) {
+  seed().catch(err => {
+    console.error("Error seeding database:", err);
+    process.exit(1);
+  });
+}

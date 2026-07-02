@@ -9,6 +9,7 @@ import productsRouter from './routes/products';
 import ordersRouter from './routes/orders';
 import adminRouter from './routes/admin';
 import aiRouter from './routes/ai';
+import { ensureSeedData } from './utils/seed';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.get('/', (req, res) => {
 // Start Server
 async function startServer() {
   await connectDB();
+  await ensureSeedData();
   app.listen(PORT, () => {
     console.log(`🚀 ShopEZ Backend Server running on http://localhost:${PORT}`);
   });

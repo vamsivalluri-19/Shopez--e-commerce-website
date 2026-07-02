@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, ArrowUpDown, Star, Grid, Sparkles, Filter, X } from 'lucide-react';
 import axios from 'axios';
+import { fallbackCatalogProducts } from '../utils/fallbackCatalog';
 
 interface CatalogProps {
   setActivePage: (page: string) => void;
@@ -26,6 +27,14 @@ export default function Catalog({ setActivePage, setSelectedProductId, initialCa
   
   const [loading, setLoading] = useState(true);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  const normalizeProducts = (items: any[]) => {
+    return items.map((item, index) => ({
+      ...item,
+      _id: item._id || `fallback-${index}`,
+      images: Array.isArray(item.images) ? item.images.filter(Boolean) : []
+    }));
+  };
 
   // Listen to initial category navigation
   useEffect(() => {
@@ -75,13 +84,18 @@ export default function Catalog({ setActivePage, setSelectedProductId, initialCa
 
         const res = await axios.get(url);
         
-        let filteredList = res.data;
+        const fetchedList = Array.isArray(res.data) ? normalizeProducts(res.data) : [];
+        let filteredList = fetchedList.length > 0 ? fetchedList : normalizeProducts(fallbackCatalogProducts);
         if (selectedRating > 0) {
           filteredList = filteredList.filter((p: any) => p.rating >= selectedRating);
         }
         setProducts(filteredList);
       } catch (err) {
-        setProducts([]);
+        let fallbackList = normalizeProducts(fallbackCatalogProducts);
+        if (selectedRating > 0) {
+          fallbackList = fallbackList.filter((p: any) => p.rating >= selectedRating);
+        }
+        setProducts(fallbackList);
       } finally {
         setLoading(false);
       }
@@ -289,10 +303,13 @@ export default function Catalog({ setActivePage, setSelectedProductId, initialCa
                 <div 
                   key={product._id}
                   onClick={() => {
+                    if (String(product._id).startsWith('fallback-')) {
+                      return;
+                    }
                     setSelectedProductId(product._id);
                     setActivePage('product-details');
                   }}
-                  className="group cursor-pointer space-y-4"
+                  className={`group space-y-4 ${String(product._id).startsWith('fallback-') ? 'cursor-default' : 'cursor-pointer'}`}
                 >
                   <div className="overflow-hidden relative aspect-[3/4] bg-neutral-100 dark:bg-neutral-900/10">
                     <img 

@@ -5,6 +5,7 @@ import { addToCart } from '../store/cartSlice';
 import { fetchStart, fetchDetailSuccess, fetchFailure, addReviewLocal } from '../store/productSlice';
 import { Heart, ShoppingBag, Star, Ruler, Sparkles, Send, Check, ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import { fallbackCatalogProducts, getFallbackProductById } from '../utils/fallbackCatalog';
 
 interface ProductDetailsProps {
   productId: string;
@@ -36,6 +37,8 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
   const [fitPref, setFitPref] = useState<'slim' | 'regular' | 'loose'>('regular');
   const [aiSizeResult, setAiSizeResult] = useState<string | null>(null);
   const [showSizeChart, setShowSizeChart] = useState(false);
+  const fallbackProduct = getFallbackProductById(productId);
+  const isFallbackProduct = Boolean(product?._id?.startsWith('fallback-') || fallbackProduct);
 
   // Fetch product detail on mount/id change
   useEffect(() => {
@@ -60,6 +63,25 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
         setUserRating(5);
         setSubmitError('');
       } catch (err: any) {
+        if (fallbackProduct) {
+          const similarProducts = fallbackCatalogProducts
+            .filter(item => item._id !== fallbackProduct._id && item.category === fallbackProduct.category)
+            .slice(0, 4);
+
+          dispatch(fetchDetailSuccess({
+            product: fallbackProduct as any,
+            reviews: [],
+            similar: similarProducts as any
+          }));
+          setSelectedImage(fallbackProduct.images[0] || '');
+          setSelectedSize(fallbackProduct.sizes[0] || '');
+          setSelectedColor(fallbackProduct.colors[0] || '');
+          setUserComment('');
+          setUserRating(5);
+          setSubmitError('');
+          return;
+        }
+
         dispatch(fetchFailure(err.response?.data?.message || 'Error fetching details.'));
       }
     };
@@ -85,6 +107,10 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
   };
 
   const handleToggleWishlist = async () => {
+    if (isFallbackProduct) {
+      setSubmitError('This preview item is not connected to the deployed API.');
+      return;
+    }
     if (!isAuthenticated) {
       setActivePage('profile'); // Send to register/login
       return;
@@ -103,6 +129,10 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isFallbackProduct) {
+      setSubmitError('Reviews are disabled for fallback preview items.');
+      return;
+    }
     if (!isAuthenticated) {
       setSubmitError('Authentication required to submit reviews.');
       return;
