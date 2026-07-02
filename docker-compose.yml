@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  database:
+    image: mongo:latest
+    container_name: shopez-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - shopez-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shopez-backend-server
+    ports:
+      - "5050:5050"
+    environment:
+      - PORT=5050
+      - MONGO_URI=mongodb://database:27017/shopez
+      - JWT_SECRET=super_secret_shopez_key_12345
+      - JWT_EXPIRES_IN=7d
+      - NODE_ENV=production
+    depends_on:
+      - database
+    networks:
+      - shopez-network
+
+  frontend:
+    build:
+      context: ./frontend-web
+      dockerfile: Dockerfile
+    container_name: shopez-frontend-web
+    ports:
+      - "5150:5150"
+    depends_on:
+      - backend
+    networks:
+      - shopez-network
+
+volumes:
+  mongo-data:
+
+networks:
+  shopez-network:
+    driver: bridge
