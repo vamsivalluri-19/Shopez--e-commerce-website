@@ -83,3 +83,11 @@ To verify user features and admin dashboard metrics:
 * **Regular Customer Login**:
   - Email: `user@shopez.com`
   - Password: `userpassword`
+
+---
+
+## Production Deployments
+
+* **Web Frontend (Vercel)**: Deployed at [shopez-e-commerce-website-1xwn.vercel.app](https://shopez-e-commerce-website-1xwn.vercel.app)
+* **API Backend (Render)**: Deployed and configured with MongoDB Atlas.
+
