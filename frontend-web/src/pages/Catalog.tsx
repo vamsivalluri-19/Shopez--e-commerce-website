@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, ArrowUpDown, Star, Grid, Sparkles, Filter, X } from 'lucide-react';
 import axios from 'axios';
 import { fallbackCatalogProducts } from '../utils/fallbackCatalog';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface CatalogProps {
   setActivePage: (page: string) => void;
@@ -363,7 +364,7 @@ export default function Catalog({ setActivePage, setSelectedProductId, initialCa
                 >
                   <div className="overflow-hidden relative aspect-[3/4] bg-neutral-100 dark:bg-neutral-900/10">
                     <img 
-                      src={product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} 
+                      src={resolveAssetUrl(product.images && product.images.length > 0 ? product.images[0] : '') || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'}
                       alt={product.name} 
                       className="w-full h-full object-cover hover-scale-luxury" 
                     />

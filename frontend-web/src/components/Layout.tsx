@@ -6,6 +6,7 @@ import { removeFromCart, updateQuantity, applyCoupon, removeCoupon, getCartTotal
 import { ShoppingBag, Heart, Search, User, Sun, Moon, X, Menu, ArrowRight, Trash2, Check, Sparkles } from 'lucide-react';
 import AiStylist from './AiStylist';
 import axios from 'axios';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -252,7 +253,7 @@ export default function Layout({ children, activePage, setActivePage, setSelecte
                         }}
                         className="flex items-center gap-3 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 cursor-pointer transition-colors"
                       >
-                        <img src={p.images[0]} alt={p.name} className="w-12 h-12 object-cover" />
+                        <img src={resolveAssetUrl(p.images[0])} alt={p.name} className="w-12 h-12 object-cover" />
                         <div>
                           <div className="text-xs font-semibold uppercase">{p.name}</div>
                           <div className="text-[10px] text-luxury-gold">${p.price} <span className="text-neutral-400 italic font-light ml-2">{p.brand}</span></div>
@@ -377,7 +378,7 @@ export default function Layout({ children, activePage, setActivePage, setSelecte
                       key={`${item.product}-${item.size}-${item.color}`}
                       className="flex gap-4 p-3 bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-100/50 dark:border-neutral-900/50"
                     >
-                      <img src={item.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt={item.name} className="w-20 h-24 object-cover" />
+                      <img src={resolveAssetUrl(item.image) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt={item.name} className="w-20 h-24 object-cover" />
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between">

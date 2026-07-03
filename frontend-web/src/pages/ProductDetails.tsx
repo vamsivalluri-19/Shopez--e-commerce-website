@@ -6,6 +6,7 @@ import { fetchStart, fetchDetailSuccess, fetchFailure, addReviewLocal } from '..
 import { Heart, ShoppingBag, Star, Ruler, Sparkles, Send, Check, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import { fallbackCatalogProducts, getFallbackProductById } from '../utils/fallbackCatalog';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface ProductDetailsProps {
   productId: string;
@@ -279,7 +280,7 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
                       : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-400'
                   }`}
                 >
-                  <img src={img || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt="" className="w-full h-full object-cover" />
+                  <img src={resolveAssetUrl(img) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -288,7 +289,7 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
           {/* Main Zoomable Image */}
           <div className="flex-1 overflow-hidden bg-neutral-50 dark:bg-neutral-900/10 aspect-[3/4] border relative group cursor-zoom-in">
             <img 
-              src={selectedImage || (product.images && product.images[0]) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} 
+              src={resolveAssetUrl(selectedImage || (product.images && product.images[0]) || '') || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'}
               alt={product.name} 
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-150 origin-center" 
               style={{ transformOrigin: zoomPos }}
@@ -606,7 +607,7 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
                 className="group cursor-pointer space-y-4"
               >
                 <div className="overflow-hidden aspect-[3/4] bg-neutral-50 border">
-                  <img src={item.images && item.images.length > 0 ? item.images[0] : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt={item.name} className="w-full h-full object-cover hover-scale-luxury" />
+                  <img src={resolveAssetUrl(item.images && item.images.length > 0 ? item.images[0] : '') || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt={item.name} className="w-full h-full object-cover hover-scale-luxury" />
                 </div>
                 <div className="space-y-1">
                   <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-bold">{item.brand}</span>

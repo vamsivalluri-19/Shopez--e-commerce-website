@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingBag, Star, Sparkles, Shield, Clock } from 'lucide-react';
 import axios from 'axios';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface LandingProps {
   setActivePage: (page: string) => void;
@@ -173,7 +174,7 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
               className="group cursor-pointer overflow-hidden relative aspect-[3/4] bg-neutral-900"
             >
               <img 
-                src={cat.image} 
+                src={resolveAssetUrl(cat.image)} 
                 alt={cat.name} 
                 className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-90" 
               />
@@ -215,7 +216,7 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
             >
               <div className="w-16 h-16 rounded-full overflow-hidden mb-3 border border-neutral-100 dark:border-neutral-800 group-hover:border-luxury-gold transition-colors duration-300">
                 <img 
-                  src={brand.image} 
+                  src={resolveAssetUrl(brand.image)} 
                   alt={brand.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -309,7 +310,7 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
                 {/* Image Container with Zoom */}
                 <div className="overflow-hidden relative aspect-[3/4] bg-neutral-100">
                   <img 
-                    src={product.images[0]} 
+                    src={resolveAssetUrl(product.images[0])} 
                     alt={product.name} 
                     className="w-full h-full object-cover hover-scale-luxury" 
                   />

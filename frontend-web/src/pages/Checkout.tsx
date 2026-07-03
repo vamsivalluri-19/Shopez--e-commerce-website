@@ -4,6 +4,7 @@ import { RootState } from '../store';
 import { clearCart, getCartTotals } from '../store/cartSlice';
 import { CreditCard, Truck, CheckCircle2, QrCode, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface CheckoutProps {
   setActivePage: (page: string) => void;
@@ -398,7 +399,7 @@ export default function Checkout({ setActivePage }: CheckoutProps) {
             <div className="space-y-4 max-h-60 overflow-y-auto">
               {items.map(item => (
                 <div key={`${item.product}-${item.size}-${item.color}`} className="flex gap-3 text-xs border-b pb-3 last:border-0 last:pb-0">
-                  <img src={item.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt={item.name} className="w-12 h-16 object-cover" />
+                  <img src={resolveAssetUrl(item.image) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt={item.name} className="w-12 h-16 object-cover" />
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="font-semibold truncate uppercase tracking-wider">{item.name}</div>

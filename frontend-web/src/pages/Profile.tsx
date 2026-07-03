@@ -4,6 +4,7 @@ import { RootState } from '../store';
 import { authStart, authSuccess, authFailure, logout, updateAddresses } from '../store/authSlice';
 import { User, Mail, Lock, Phone, MapPin, Heart, ShoppingBag, Truck, Calendar, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 declare global {
   interface Window {
@@ -528,7 +529,7 @@ export default function Profile({ setActivePage, setSelectedProductId }: Profile
                         {order.orderItems.map((item: any, i: number) => (
                           <div key={i} className="flex justify-between items-center text-xs">
                             <div className="flex items-center gap-3">
-                              <img src={item.image} alt="" className="w-10 h-12 object-cover" />
+                              <img src={resolveAssetUrl(item.image)} alt="" className="w-10 h-12 object-cover" />
                               <div>
                                 <p className="font-semibold uppercase truncate max-w-[200px]">{item.name}</p>
                                 <p className="text-[10px] text-neutral-400 uppercase font-light">{item.size} / {item.color} (x{item.quantity})</p>

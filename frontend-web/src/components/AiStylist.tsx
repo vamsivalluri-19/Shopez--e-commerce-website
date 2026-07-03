@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Sparkles, Ruler, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface Message {
   id: string;
@@ -241,7 +242,7 @@ export default function AiStylist() {
                             <div className="grid grid-cols-2 gap-2">
                               {msg.products.map((p: any) => (
                                 <div key={p._id} className="bg-neutral-50 dark:bg-neutral-950 p-1.5 border border-neutral-100 dark:border-neutral-800">
-                                  <img src={p.images[0]} alt={p.name} className="w-full h-16 object-cover mb-1" />
+                                  <img src={resolveAssetUrl(p.images[0])} alt={p.name} className="w-full h-16 object-cover mb-1" />
                                   <div className="text-[10px] font-semibold truncate">{p.name}</div>
                                   <div className="text-[10px] text-luxury-gold">${p.price}</div>
                                 </div>
