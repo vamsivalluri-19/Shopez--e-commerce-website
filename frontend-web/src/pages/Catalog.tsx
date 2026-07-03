@@ -61,11 +61,11 @@ export default function Catalog({ setActivePage, setSelectedProductId, initialCa
     const fetchMeta = async () => {
       try {
         const res = await axios.get('/api/products/categories');
-        setCategories(res.data.categories || ['Men', 'Women', 'Kids', 'Accessories', 'Footwear']);
-        setBrands(res.data.brands || ['Zara', 'Nike', 'H&M', 'Gucci', 'Rolex', 'Ray-Ban']);
+        setCategories(res.data.categories || ['Men', 'Women', 'Laptops', 'Accessories']);
+        setBrands(res.data.brands || ['Zara', 'H&M', 'Nike', 'Gucci', 'Lenovo', 'Noise', 'Adesh Creation']);
       } catch (err) {
-        setCategories(['Men', 'Women', 'Kids', 'Accessories', 'Footwear']);
-        setBrands(['Zara', 'Nike', 'H&M', 'Gucci', 'Rolex', 'Ray-Ban']);
+        setCategories(['Men', 'Women', 'Laptops', 'Accessories']);
+        setBrands(['Zara', 'H&M', 'Nike', 'Gucci', 'Lenovo', 'Noise', 'Adesh Creation']);
       }
     };
     fetchMeta();
@@ -85,13 +85,63 @@ export default function Catalog({ setActivePage, setSelectedProductId, initialCa
         const res = await axios.get(url);
         
         const fetchedList = Array.isArray(res.data) ? normalizeProducts(res.data) : [];
-        let filteredList = fetchedList.length > 0 ? fetchedList : normalizeProducts(fallbackCatalogProducts);
+        let filteredList = fetchedList;
+        
+        if (fetchedList.length === 0) {
+          let list = normalizeProducts(fallbackCatalogProducts);
+          if (selectedCategory) {
+            list = list.filter((p: any) => p.category.toLowerCase() === selectedCategory.toLowerCase());
+          }
+          if (selectedBrand) {
+            list = list.filter((p: any) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
+          }
+          if (priceRange < 1000) {
+            list = list.filter((p: any) => p.price <= priceRange);
+          }
+          if (search) {
+            const s = search.toLowerCase();
+            list = list.filter((p: any) => p.name.toLowerCase().includes(s) || p.description.toLowerCase().includes(s));
+          }
+          if (sortBy) {
+            if (sortBy === 'price_asc') {
+              list.sort((a, b) => a.price - b.price);
+            } else if (sortBy === 'price_desc') {
+              list.sort((a, b) => b.price - a.price);
+            } else if (sortBy === 'rating') {
+              list.sort((a, b) => b.rating - a.rating);
+            }
+          }
+          filteredList = list;
+        }
+
         if (selectedRating > 0) {
           filteredList = filteredList.filter((p: any) => p.rating >= selectedRating);
         }
         setProducts(filteredList);
       } catch (err) {
         let fallbackList = normalizeProducts(fallbackCatalogProducts);
+        if (selectedCategory) {
+          fallbackList = fallbackList.filter((p: any) => p.category.toLowerCase() === selectedCategory.toLowerCase());
+        }
+        if (selectedBrand) {
+          fallbackList = fallbackList.filter((p: any) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
+        }
+        if (priceRange < 1000) {
+          fallbackList = fallbackList.filter((p: any) => p.price <= priceRange);
+        }
+        if (search) {
+          const s = search.toLowerCase();
+          fallbackList = fallbackList.filter((p: any) => p.name.toLowerCase().includes(s) || p.description.toLowerCase().includes(s));
+        }
+        if (sortBy) {
+          if (sortBy === 'price_asc') {
+            fallbackList.sort((a, b) => a.price - b.price);
+          } else if (sortBy === 'price_desc') {
+            fallbackList.sort((a, b) => b.price - a.price);
+          } else if (sortBy === 'rating') {
+            fallbackList.sort((a, b) => b.rating - a.rating);
+          }
+        }
         if (selectedRating > 0) {
           fallbackList = fallbackList.filter((p: any) => p.rating >= selectedRating);
         }

@@ -24,6 +24,12 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [addedNotify, setAddedNotify] = useState(false);
+  const [sizeWarning, setSizeWarning] = useState(false);
+  const [zoomPos, setZoomPos] = useState('center');
+
+  // Pincode check states
+  const [pincode, setPincode] = useState('');
+  const [deliveryMessage, setDeliveryMessage] = useState('');
 
   // Review states
   const [userRating, setUserRating] = useState(5);
@@ -37,6 +43,22 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
   const [fitPref, setFitPref] = useState<'slim' | 'regular' | 'loose'>('regular');
   const [aiSizeResult, setAiSizeResult] = useState<string | null>(null);
   const [showSizeChart, setShowSizeChart] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLImageElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos(`${x}% ${y}%`);
+  };
+
+  const checkDelivery = () => {
+    if (/^\d{6}$/.test(pincode)) {
+      setDeliveryMessage('🟢 Free delivery by Wednesday, July 8 | Cash on Delivery available');
+    } else {
+      setDeliveryMessage('🔴 Please enter a valid 6-digit pincode');
+    }
+  };
+
   const fallbackProduct = getFallbackProductById(productId);
   const isFallbackProduct = Boolean(product?._id?.startsWith('fallback-') || fallbackProduct);
 
@@ -86,10 +108,39 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
       }
     };
     fetchDetail();
-  }, [productId, dispatch]);
+  }, [productId, dispatch, fallbackProduct]);
+
+  // Swap product image based on color selection (e.g. for the dress color variations)
+  useEffect(() => {
+    if (product && product.images && product.images.length > 0) {
+      if (selectedColor === 'Floral Blue') {
+        const blueImg = product.images.find((img: string) => img.includes('blue'));
+        if (blueImg) setSelectedImage(blueImg);
+      } else if (selectedColor === 'Floral Red') {
+        const redImg = product.images.find((img: string) => img.includes('red'));
+        if (redImg) setSelectedImage(redImg);
+      } else if (selectedColor === 'Floral Orange') {
+        const orangeImg = product.images[0];
+        if (orangeImg) setSelectedImage(orangeImg);
+      }
+    }
+  }, [selectedColor, product]);
 
   const handleAddToCart = () => {
     if (!product) return;
+    
+    // Size selection validation (Flipkart-style warning)
+    const hasSizes = product.sizes && product.sizes.length > 0;
+    if (hasSizes && !selectedSize) {
+      setSizeWarning(true);
+      const sizeSection = document.getElementById('size-selector-section');
+      if (sizeSection) {
+        sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    setSizeWarning(false);
+
     dispatch(addToCart({
       product: product._id,
       name: product.name,
@@ -212,29 +263,38 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
       {/* Product Presentation */}
       <div className="flex flex-col md:flex-row gap-12">
         
-        {/* Images Grid */}
-        <div className="md:w-1/2 flex flex-col gap-4">
-          <div className="overflow-hidden bg-neutral-50 dark:bg-neutral-900/10 aspect-[3/4] border">
-            <img 
-              src={selectedImage || (product.images && product.images[0]) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} 
-              alt={product.name} 
-              className="w-full h-full object-cover transition-all" 
-            />
-          </div>
-          {/* Thumbnails */}
+        {/* Images Grid (Flipkart-style vertical thumbnails + hover zoom) */}
+        <div className="md:w-1/2 flex gap-4 items-start">
+          {/* Vertical Thumbnails */}
           {product.images && product.images.length > 1 && (
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-2.5 max-h-[500px] overflow-y-auto pr-1 select-none w-20 shrink-0 scrollbar-thin">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
+                  onMouseEnter={() => setSelectedImage(img)}
                   onClick={() => setSelectedImage(img)}
-                  className={`w-20 aspect-[3/4] border overflow-hidden ${selectedImage === img ? 'border-luxury-gold' : 'border-neutral-200'}`}
+                  className={`w-full aspect-[3/4] border-2 overflow-hidden transition-all duration-200 ${
+                    selectedImage === img 
+                      ? 'border-luxury-gold shadow-sm scale-[1.03]' 
+                      : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-400'
+                  }`}
                 >
                   <img src={img || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
           )}
+          
+          {/* Main Zoomable Image */}
+          <div className="flex-1 overflow-hidden bg-neutral-50 dark:bg-neutral-900/10 aspect-[3/4] border relative group cursor-zoom-in">
+            <img 
+              src={selectedImage || (product.images && product.images[0]) || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} 
+              alt={product.name} 
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-150 origin-center" 
+              style={{ transformOrigin: zoomPos }}
+              onMouseMove={handleMouseMove}
+            />
+          </div>
         </div>
 
         {/* Product Configurations */}
@@ -289,7 +349,7 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
 
             {/* Size Selector + Size Recommender CTA */}
             {product.sizes && product.sizes.length > 0 && (
-              <div className="space-y-3">
+              <div id="size-selector-section" className={`space-y-3 p-3 border transition-all duration-300 ${sizeWarning ? 'border-red-500 bg-red-50/10' : 'border-transparent'}`}>
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest">Select Size</span>
                   <div className="flex gap-4">
@@ -311,21 +371,30 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
                 </div>
                 
                 {/* Size Chips */}
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   {product.sizes.map(size => (
                     <button
                       key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`w-12 h-12 border flex items-center justify-center text-xs font-semibold transition-all ${
+                      onClick={() => {
+                        setSelectedSize(size);
+                        setSizeWarning(false);
+                      }}
+                      className={`h-12 px-4 min-w-[3rem] border flex items-center justify-center text-xs font-semibold transition-all ${
                         selectedSize === size 
                           ? 'border-luxury-gold bg-luxury-gold/5 text-luxury-gold' 
-                          : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-400'
+                          : sizeWarning 
+                            ? 'border-red-300 hover:border-red-500 text-red-500 animate-pulse'
+                            : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-400'
                       }`}
                     >
                       {size}
                     </button>
                   ))}
                 </div>
+                
+                {sizeWarning && (
+                  <p className="text-[10px] uppercase font-bold text-red-500 tracking-wider">Please select a size to proceed</p>
+                )}
                 
                 {/* AI Size recommendation Panel Overlay */}
                 {showAiSize && (
@@ -411,6 +480,31 @@ export default function ProductDetails({ productId, setActivePage, setSelectedPr
               >
                 <Heart className="w-5 h-5 text-neutral-500 hover:text-red-500" />
               </button>
+            </div>
+
+            {/* Delivery pincode checker (Flipkart style) */}
+            <div className="pt-4 border-t border-dashed border-neutral-100 dark:border-neutral-900 space-y-2">
+              <span className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest block">Delivery & Availability</span>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter 6-digit Pincode (e.g. 500001)"
+                  maxLength={6}
+                  value={pincode}
+                  onChange={e => setPincode(e.target.value.replace(/\D/g, ''))}
+                  className="flex-1 px-3 py-2 text-xs bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 focus:outline-none focus:border-luxury-gold uppercase"
+                />
+                <button
+                  type="button"
+                  onClick={checkDelivery}
+                  className="px-4 bg-luxury-charcoal dark:bg-luxury-gold text-white dark:text-luxury-charcoal text-[10px] uppercase font-bold hover:opacity-90 tracking-wider border border-transparent"
+                >
+                  Check
+                </button>
+              </div>
+              {deliveryMessage && (
+                <p className={`text-[10px] font-semibold tracking-wide transition-all ${deliveryMessage.includes('🟢') ? 'text-green-600' : 'text-red-500'}`}>{deliveryMessage}</p>
+              )}
             </div>
           </div>
 

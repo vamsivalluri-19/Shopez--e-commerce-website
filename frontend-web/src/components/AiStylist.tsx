@@ -57,11 +57,11 @@ export default function AiStylist() {
     } catch (err) {
       // Local Fallback if API fails
       const text = input.toLowerCase();
-      let reply = "I couldn't reach the server, but as a local backup stylist: I suggest pairing the Classic Trench Coat with white knit sneakers for a polished casual look.";
+      let reply = "I couldn't reach the server, but as a local backup stylist: I suggest checking out our Elegant Women's Tunic Dress or Men's Casual Cotton Shirt with AeroKnit Trainers.";
       if (text.includes('shoe') || text.includes('sneaker')) {
-        reply = "Knit sneakers are wonderful for both streetwear and comfort. Our Nike Knit Sneakers are highly recommended!";
+        reply = "AeroKnit Cushioned Trainers are wonderful for both comfort and performance. Our trainers are highly recommended!";
       } else if (text.includes('size')) {
-        reply = "Try using the Size Calculator tool next to the chat bar to compute your matching size!";
+        reply = "Try using the Size Calculator tool in the header to compute your recommended size!";
       }
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),

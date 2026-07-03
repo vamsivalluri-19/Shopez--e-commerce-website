@@ -39,24 +39,24 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
         // Fallback mock items
         setTrending([
           {
-            _id: "1",
-            name: "Classic Cashmere Trench Coat",
-            price: 249,
+            _id: "fallback-jeans",
+            name: "Zara Cashmere Trench Coat",
+            price: 249.00,
             discount: 10,
             brand: "Zara",
-            category: "Women",
+            category: "Men",
             rating: 4.8,
-            images: ["https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80"]
+            images: ["/projectImg/zara_coat/img1.webp"]
           },
           {
-            _id: "2",
-            name: "ActiveFit Breathable Knit Sneakers",
-            price: 135,
+            _id: "fallback-shoes",
+            name: "AeroKnit Cushioned Trainers",
+            price: 120,
             discount: 0,
             brand: "Nike",
             category: "Footwear",
-            rating: 5,
-            images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"]
+            rating: 4.7,
+            images: ["/projectImg/shoes/img1.webp"]
           }
         ]);
       } finally {
@@ -156,12 +156,11 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
           </button>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { name: 'Women Couture', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80', desc: 'Flowy Silk Dresses & Coats', category: 'Women' },
-            { name: 'Men Streetwear', image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80', desc: 'Heavyweight Hoodies & Jackets', category: 'Men' },
-            { name: 'Premium Footwear', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80', desc: 'Impact Knit Sneakers', category: 'Footwear' },
-            { name: 'Accessories', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80', desc: 'Luxury Bags & Timepieces', category: 'Accessories' }
+            { name: 'Men Fashion', image: '/projectImg/shirt/hm_img1.webp', desc: 'Premium Shirts & Denim', category: 'Men' },
+            { name: 'Women Couture', image: '/projectImg/women1/adesh_img1.webp', desc: 'Elegant Kurta & Palazzo Sets', category: 'Women' },
+            { name: 'High-Tech Laptops', image: '/projectImg/yoga_book/img1.webp', desc: 'Gaming & Dual-Screen Laptops', category: 'Laptops' }
           ].map((cat, i) => (
             <div 
               key={i} 
@@ -196,13 +195,13 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {[
-            { name: 'Zara', icon: '✨', tagline: 'Premium Tailoring' },
-            { name: 'H&M', icon: '🌿', tagline: 'Modern Essentials' },
-            { name: 'Nike', icon: '⚡', tagline: 'Athletics & Tech' },
-            { name: 'Adidas', icon: '🏆', tagline: 'Active Lifestyle' },
-            { name: 'Gucci', icon: '👜', tagline: 'Luxury Couture' },
-            { name: 'Rolex', icon: '👑', tagline: 'Fine Timepieces' },
-            { name: 'Ray-Ban', icon: '🕶️', tagline: 'Classic Eyewear' }
+            { name: 'Zara', image: '/projectImg/zara_coat/zara_img1.webp', tagline: 'Premium Tailoring' },
+            { name: 'H&M', image: '/projectImg/shirt/hm_img1.webp', tagline: 'Modern Essentials' },
+            { name: 'Nike', image: '/projectImg/shoes/nike_img1.webp', tagline: 'Athletic Luxury' },
+            { name: 'Gucci', image: '/projectImg/shirt2/gucci_img1.webp', tagline: 'Luxury Couture' },
+            { name: 'Lenovo', image: '/projectImg/lenovo_loq/img1.webp', tagline: 'Innovative Laptops' },
+            { name: 'Noise', image: '/projectImg/noise_headphones/noise_img1.webp', tagline: 'Premium Audio' },
+            { name: 'Adesh Creation', image: '/projectImg/women1/adesh_img1.webp', tagline: 'Elegant Ethnic Wear' }
           ].map((brand) => (
             <button
               key={brand.name}
@@ -214,7 +213,13 @@ export default function Landing({ setActivePage, setSelectedProductId, setSelect
               }}
               className="p-5 border border-neutral-100 dark:border-neutral-900 bg-white dark:bg-neutral-950 hover:border-luxury-gold dark:hover:border-luxury-gold transition-all duration-300 flex flex-col items-center justify-center text-center group shadow-sm"
             >
-              <span className="text-2xl mb-1.5 group-hover:scale-110 transition-transform duration-300">{brand.icon}</span>
+              <div className="w-16 h-16 rounded-full overflow-hidden mb-3 border border-neutral-100 dark:border-neutral-800 group-hover:border-luxury-gold transition-colors duration-300">
+                <img 
+                  src={brand.image} 
+                  alt={brand.name} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 group-hover:text-luxury-gold transition-colors">{brand.name}</span>
               <span className="text-[9px] text-neutral-400 font-light mt-1 uppercase tracking-wide truncate max-w-full">{brand.tagline}</span>
             </button>

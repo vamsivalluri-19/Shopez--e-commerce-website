@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { connectDB } from './models';
 
 // Import routers
@@ -19,6 +20,9 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static project images
+app.use('/projectImg', express.static(path.join(__dirname, '../../projectImg/projectImg')));
 
 // Routes Hook-up
 app.use('/api/auth', authRouter);

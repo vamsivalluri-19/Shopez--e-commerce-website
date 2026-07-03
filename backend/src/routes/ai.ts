@@ -68,25 +68,28 @@ router.post('/chat', async (req: Request, res: Response) => {
     let recommendedProducts: any[] = [];
 
     if (query.includes('shoe') || query.includes('sneaker') || query.includes('footwear')) {
-      reply = "For shoes, I highly recommend our active-fit sneakers. They feature breathable knit design and dual-density foam - perfect for casual styles or high performance.";
-      recommendedProducts = products.filter(p => p.category === 'Footwear');
-    } else if (query.includes('coat') || query.includes('trench') || query.includes('jacket') || query.includes('winter') || query.includes('hoodie')) {
-      reply = "Layering is key for clean silhouettes. Check out our Premium Cashmere Trench Coat for elegance, or our Heavyweight Fleece Hoodie for dynamic streetwear vibes.";
-      recommendedProducts = products.filter(p => p.name.toLowerCase().includes('coat') || p.name.toLowerCase().includes('hoodie') || p.name.toLowerCase().includes('jacket'));
-    } else if (query.includes('women') || query.includes('dress') || query.includes('saree') || query.includes('floral')) {
-      reply = "For women's styling, our Floral Summer Maxi Dress is trending now. You can match it with the Minimalist Leather Crossbody Bag for a luxurious evening look.";
+      reply = "For footwear, I highly recommend our AeroKnit Cushioned Trainers in the Men's section. They feature a breathable knit design and responsive impact cushioning - perfect for active or casual styling.";
+      recommendedProducts = products.filter(p => p.name.toLowerCase().includes('trainers'));
+    } else if (query.includes('coat') || query.includes('trench') || query.includes('outerwear') || query.includes('tunic') || query.includes('dress') || query.includes('kurta') || query.includes('palazzo')) {
+      reply = "For elegant ethnic looks, check out our Women’s White Elephant & Umbrella Printed A-Line Kurta with Palazzo Set, or our Zara Cashmere Trench Coat for a premium daily outerwear option.";
+      recommendedProducts = products.filter(p => p.name.toLowerCase().includes('kurta') || p.name.toLowerCase().includes('coat'));
+    } else if (query.includes('women') || query.includes('dress') || query.includes('tunic') || query.includes('girl') || query.includes('female') || query.includes('kurta') || query.includes('palazzo')) {
+      reply = "For women's fashion, our Women’s White Elephant & Umbrella Printed A-Line Kurta with Palazzo Set is our highlighted piece. It is crafted from premium Viscose Rayon with beautiful elephant and umbrella print work.";
       recommendedProducts = products.filter(p => p.category === 'Women');
-    } else if (query.includes('men') || query.includes('shirt') || query.includes('casual')) {
-      reply = "For a classic, casual men's look, we recommend starting with the Oversized Heavyweight Fleece Hoodie paired with Denim Trucker Jacket. It is versatile, premium, and keeps you warm.";
+    } else if (query.includes('men') || query.includes('shirt') || query.includes('casual') || query.includes('male') || query.includes('boy')) {
+      reply = "For men's fashion, we offer the Casual Cotton Shirt, the Premium Linen Shirt, and the Zara Cashmere Trench Coat. These provide a highly versatile, premium, and comfortable wardrobe.";
       recommendedProducts = products.filter(p => p.category === 'Men');
-    } else if (query.includes('accessory') || query.includes('watch') || query.includes('bag') || query.includes('glass')) {
-      reply = "Accessories elevate a outfit from standard to premium. A Rolex Submariner Watch or Ray-Ban Aviators adds timeless prestige to any casual or formal wear.";
+    } else if (query.includes('laptop') || query.includes('computer') || query.includes('macbook') || query.includes('lenovo')) {
+      reply = "For laptops and high-performance productivity, our Lenovo laptop collection (including the Lenovo Yoga Book 9 and Lenovo LOQ 2025) offers outstanding choices.";
+      recommendedProducts = products.filter(p => p.category === 'Laptops');
+    } else if (query.includes('accessory') || query.includes('headphone') || query.includes('noise')) {
+      reply = "For premium audio and styling accessories, check out our Noise Airwave Max 4 Bluetooth Headphones featuring 70 hours of playtime and environmental noise cancellation.";
       recommendedProducts = products.filter(p => p.category === 'Accessories');
-    } else if (query.includes('outfit') || query.includes('suggest') || query.includes('match')) {
-      reply = "Here's a curated outfit styling suggestion: Pair our Oversized Heavyweight Hoodie (Sage Green) with classic knit sneakers. Complete the look with Titanium Aviator Sunglasses for a modern luxury streetwear aesthetic.";
-      recommendedProducts = products.slice(0, 3);
+    } else if (query.includes('outfit') || query.includes('suggest') || query.includes('match') || query.includes('color')) {
+      reply = "Here's a curated outfit styling suggestion: Pair our Casual Cotton Shirt with the Zara Cashmere Trench Coat. Complete the look with our AeroKnit Cushioned Trainers for a modern, active luxury aesthetic. For women, the Women’s White Elephant & Umbrella Printed A-Line Kurta with Palazzo Set offers a complete, elegant outfit.";
+      recommendedProducts = products.filter(p => ['shirt', 'coat', 'trainers', 'kurta'].some(kw => p.name.toLowerCase().includes(kw)));
     } else if (query.includes('hi') || query.includes('hello') || query.includes('hey')) {
-      reply = "Hello! I am your ShopEZ AI Personal Shopping Assistant. I can help you find products, calculate your perfect fit, or suggest complete outfit matching combinations. What are you shopping for today?";
+      reply = "Hello! I am your ShopEZ AI Personal Shopping Stylist. I can help you find products in our Men, Women, and Laptops sections, suggest outfit matches, or explain our dress color options. What are you shopping for today?";
     }
 
     res.json({
