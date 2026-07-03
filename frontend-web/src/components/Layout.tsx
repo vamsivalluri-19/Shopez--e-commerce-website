@@ -209,7 +209,7 @@ export default function Layout({ children, activePage, setActivePage, setSelecte
               <ShoppingBag className="w-4.5 h-4.5" />
               {items.length > 0 && (
                 <span className="absolute -top-1.5 -right-2 bg-luxury-gold text-luxury-charcoal text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {items.reduce((sum, item) => sum + item.quantity, 0)}
+                  {items.length}
                 </span>
               )}
             </button>
